@@ -1,0 +1,2 @@
+// counting school collection
+db.school.find().count()
