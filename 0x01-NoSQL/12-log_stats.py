@@ -14,7 +14,7 @@ def main():
     my_coll = db.logs.nginx
     print(f"{my_coll.count_documents({})} logs")
     methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
-    print("Methods")
+    print("Methods:")
     for m in methods:
         method_log = my_coll.count_documents({"method": {"$eq": m}})
         print(f"\tmethod {m}: {method_log}")
