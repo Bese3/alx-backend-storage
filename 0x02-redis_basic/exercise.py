@@ -4,7 +4,7 @@ redis excercise project
 """
 import redis
 from uuid import uuid4
-from typing import Union
+from typing import Union, Optional, Callable
 
 
 class Cache():
@@ -28,3 +28,33 @@ class Cache():
         key = str(uuid4())
         self._redis.set(key, data)
         return key
+
+    def get(self, key: str,
+            fn: Optional[Callable] = None) -> Union[str, bytes, int, float]:
+        """
+        The function retrieves a value from Redis using a given
+        key and applies a function to the value if provided.
+        """
+        value = self._redis.get(key)
+        if fn:
+            value = fn(value)
+        return value
+
+    def get_str(self, value: str) -> str:
+        """
+        The function `get_str` takes a value and decodes it
+        from UTF-8 encoding to a string.
+        """
+        return value.decode('utf-8')
+
+    def get_int(self, value: str) -> int:
+        """
+        The function `get_int` takes a value, decodes it from UTF-8
+        to a string, tries to convert it to an integer, and returns
+        the integer value. If the conversion fails, it returns 0.
+        """
+        try:
+            i = int(value.decode('utf-8'))
+        except Exception:
+            i = 0
+        return i
