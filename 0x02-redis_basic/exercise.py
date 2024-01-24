@@ -26,6 +26,28 @@ def count_calls(method: Callable) -> Callable:
     return wrapper
 
 
+def call_history(method: Callable) -> Callable:
+    """
+    The `call_history` function is a decorator that logs the input
+    and output of a method call using Redis.
+    """
+    key = method.__qualname__
+    input = key + ":inputs"
+    output = key + ":outputs"
+
+    @wraps(method)
+    def wrapper(self, *args, **kwargs):
+        """
+        The wrapper function logs the input and output of a method
+        call using Redis.
+        """
+        self._redis.rpush(input, str(args))
+        m = method(self, *args, **kwargs)
+        self._redis.rpush(output, str(m))
+        return m
+    return wrapper
+
+
 class Cache():
     """
     The Cache class is used to store data in a Redis cache and
@@ -40,6 +62,7 @@ class Cache():
         self._redis = redis.Redis()
         self._redis.flushdb()
 
+    @call_history
     @count_calls
     def store(self, data: Union[str, bytes, int, float]) -> str:
         '''
