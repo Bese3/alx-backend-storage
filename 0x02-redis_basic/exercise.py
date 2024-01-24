@@ -48,6 +48,20 @@ def call_history(method: Callable) -> Callable:
     return wrapper
 
 
+def replay(method: Callable) -> None:
+    """
+    The `replay` function retrieves and prints information about a
+    method's previous calls and their inputs and outputs.
+    """
+    key = method.__qualname__
+    r = redis.Redis()
+    print(f"{key} was called {r.get(key).decode('utf-8')} times:")
+    inputs = r.lrange(f"{key}:inputs", 0, -1)
+    outputs = r.lrange(f"{key}:outputs",0, -1)
+    for i, o in zip(inputs, outputs):
+        print(f"{key}(*{i.decode('utf-8')}) -> {o.decode('utf-8')}")
+
+
 class Cache():
     """
     The Cache class is used to store data in a Redis cache and
