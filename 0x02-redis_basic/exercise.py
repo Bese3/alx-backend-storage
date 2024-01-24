@@ -18,13 +18,13 @@ class Cache():
         The function initializes a Redis client and flushes
         the Redis database.
         """
-        self.__redis = redis.Redis()
-        self.__redis.flushdb()
+        self._redis = redis.Redis()
+        self._redis.flushdb()
 
     def store(self, data: Union[str, bytes, float, int]) -> str:
         '''
             Store data in the cache.
         '''
         key = str(uuid4())
-        self.__redis.set(key, str(data))
+        self._redis.set(key, str(data))
         return key
