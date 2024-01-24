@@ -5,6 +5,25 @@ redis excercise project
 import redis
 from uuid import uuid4
 from typing import Union, Optional, Callable
+from functools import wraps
+
+
+def count_calls(method: Callable) -> Callable:
+    """
+    The `count_calls` function is a decorator that increments a
+    counter in Redis and then calls the original method with the
+    given arguments.
+    """
+    @wraps(method)
+    def wrapper(self, *args, **kwargs):
+        """
+        The wrapper function increments a counter in Redis
+        and then calls the original method with the given arguments.
+        """
+        key = method.__qualname__
+        self._redis.incr(key)
+        return method(self, *args, **kwargs)
+    return wrapper
 
 
 class Cache():
@@ -21,6 +40,7 @@ class Cache():
         self._redis = redis.Redis()
         self._redis.flushdb()
 
+    @count_calls
     def store(self, data: Union[str, bytes, int, float]) -> str:
         '''
             Store data in the cache.
